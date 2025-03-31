@@ -6,7 +6,7 @@ import { Colors } from "../../constants/Colors";
  * Onboarding Navigation Layout
  * @description Manages screen transitions and styling for onboarding process
  */
-export default function OnboardingLayout() {
+export default function SubLayout() {
   return (
     <Stack
       screenOptions={{
@@ -21,26 +21,11 @@ export default function OnboardingLayout() {
         headerShadowVisible: false,
       }}>
       <Stack.Screen
-        name="onboarding"
+        name="subs"
         options={{
           headerShown: false,
-          title: "Welcome",
-        }}
-      />
-
-      <Stack.Screen
-        name="wallet-setup"
-        options={{
-          title: "Create Wallet",
           presentation: "card",
-        }}
-      />
-
-      <Stack.Screen
-        name="security-options"
-        options={{
-          title: "Secure Your Wallet",
-          presentation: "card",
+          title: "Add Token",
         }}
       />
     </Stack>

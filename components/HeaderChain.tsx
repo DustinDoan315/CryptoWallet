@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { router } from "expo-router";
 import React, { memo } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -28,7 +29,10 @@ const HeaderChain = () => {
       {/* Network Selector */}
       <View style={styles.networkContainer}>
         <Text style={styles.networkText}>Ethereum Main</Text>
-        <Pressable>
+        <Pressable
+          onPress={() => {
+            router.push("/add-token");
+          }}>
           <Image
             source={require("../assets/icons/down_arrow.png")}
             style={styles.downArrow}
