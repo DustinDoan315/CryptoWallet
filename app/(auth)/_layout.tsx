@@ -37,6 +37,33 @@ export default function AuthLayout() {
           presentation: "card",
         }}
       />
+
+      <Stack.Screen
+        name="secure-wallet"
+        options={{
+          headerShown: false,
+          title: "Secure Wallet",
+          presentation: "card",
+        }}
+      />
+
+      <Stack.Screen
+        name="wallet-info"
+        options={{
+          headerShown: false,
+          title: "Wallet Info",
+          presentation: "card",
+        }}
+      />
+
+      <Stack.Screen
+        name="generate-seed-phrase"
+        options={{
+          headerShown: false,
+          title: "Generate Seed Phrase",
+          presentation: "card",
+        }}
+      />
     </Stack>
   );
 }

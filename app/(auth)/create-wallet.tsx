@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import SignWithFaceID from "@/components/SignupWithBiometric";
 import { width } from "@/utils/response";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 
 const CreateNewWalletScreen = () => {
   const navigation = useNavigation();
@@ -50,7 +51,7 @@ const CreateNewWalletScreen = () => {
   };
 
   const handleCreateWallet = () => {
-    // authRoot.navigate(router.SECURE_WALLET);
+    router.navigate("./secure-wallet");
   };
 
   return (
@@ -62,10 +63,6 @@ const CreateNewWalletScreen = () => {
             source={require("../../assets/icons/arrow_back.png")}
           />
         </Pressable>
-        <Image
-          style={styles.progressBar}
-          source={require("../../assets/icons/progressBar.png")}
-        />
       </View>
 
       <View style={styles.intro}>
@@ -175,7 +172,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   backButton: {
-    marginTop: 12,
     marginLeft: 12,
   },
   backButtonImage: {

@@ -1,3 +1,7 @@
+import * as Crypto from "expo-crypto";
+import * as bip39 from "bip39";
+import { Buffer } from "buffer";
+
 const USDollar = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
@@ -33,16 +37,30 @@ export const formatTime = (time: number) => {
 //   }
 // };
 
-// export const generateSeedPhrase = async () => {
-//   try {
-//     const mnemonic = bip39.generateMnemonic();
-//     console.log("Generated Seed Phrase:", mnemonic);
-//     return mnemonic;
-//   } catch (error) {
-//     console.error("Failed to generate seed phrase:", error);
-//     return null;
-//   }
-// };
+export const generateSeedPhrase = async () => {
+  try {
+    // Generate random bytes using expo-crypto
+    const randomBytes = await Crypto.getRandomBytesAsync(16);
+
+    console.log("====================================");
+    console.log("Random Bytes:", randomBytes);
+
+    // Convert to a Buffer that bip39 can use
+    const buffer = Buffer.from(randomBytes);
+
+    console.log("====================================");
+    console.log("buffer:", buffer);
+
+    // Generate mnemonic directly from the buffer
+    const mnemonic = bip39.entropyToMnemonic(buffer);
+
+    console.log("Generated Seed Phrase:", mnemonic);
+    return mnemonic;
+  } catch (error) {
+    console.error("Failed to generate seed phrase:", error);
+    return null;
+  }
+};
 
 // export const retrievePassword = async () => {
 //   try {
