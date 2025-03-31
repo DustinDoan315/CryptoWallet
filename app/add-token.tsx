@@ -108,7 +108,11 @@ const AddToken = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: { position: "absolute", bottom: 0, right: 0, left: 0 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
   modalContainer: {
     backgroundColor: Colors.dark.background,
     borderTopLeftRadius: 20,

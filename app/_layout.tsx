@@ -53,8 +53,21 @@ export default function RootLayout() {
             name="add-token"
             options={{
               headerShown: false,
-              presentation: "modal",
+              presentation: "transparentModal",
               title: "Add Token",
+              animation: "slide_from_bottom",
+              contentStyle: { backgroundColor: "transparent" },
+              gestureEnabled: true,
+              gestureDirection: "vertical",
+            }}
+          />
+
+          <Stack.Screen
+            name="add-account"
+            options={{
+              headerShown: false,
+              presentation: "transparentModal",
+              title: "Add Account",
               animation: "slide_from_bottom",
               contentStyle: { backgroundColor: "transparent" },
               gestureEnabled: true,

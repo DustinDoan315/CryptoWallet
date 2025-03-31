@@ -17,7 +17,11 @@ const HeaderChain = () => {
           resizeMode="cover"
           style={styles.avatar}
         />
-        <Pressable style={styles.qrButton}>
+        <Pressable
+          onPress={() => {
+            router.push("/add-account");
+          }}
+          style={styles.qrButton}>
           <Image
             source={require("../assets/icons/qr_code.png")}
             resizeMode="cover"
