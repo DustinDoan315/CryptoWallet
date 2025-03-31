@@ -2,6 +2,8 @@ import * as Crypto from "expo-crypto";
 import * as bip39 from "bip39";
 import { Buffer } from "buffer";
 
+global.Buffer = Buffer;
+
 const USDollar = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",

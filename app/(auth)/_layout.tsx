@@ -64,6 +64,23 @@ export default function AuthLayout() {
           presentation: "card",
         }}
       />
+      <Stack.Screen
+        name="validate-seed-phrase"
+        options={{
+          headerShown: false,
+          title: "Validate Seed Phrase",
+          presentation: "card",
+        }}
+      />
+
+      <Stack.Screen
+        name="validate-success"
+        options={{
+          headerShown: false,
+          title: "Validate Success",
+          presentation: "card",
+        }}
+      />
     </Stack>
   );
 }

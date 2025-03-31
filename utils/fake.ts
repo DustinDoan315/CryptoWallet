@@ -27,6 +27,45 @@ export const mockTransactions = [
   },
 ];
 
+export const FakeListAssets = [
+  {
+    id: 1,
+    name: "Ethereum",
+    token: "ETH",
+    price: 3006.31,
+    img: require("../assets/icons/eth.png"),
+    profit: 1.15,
+    balance: 1.2123,
+  },
+  {
+    id: 2,
+    name: "Bitcoin",
+    token: "BTC",
+    price: 61213.54,
+    img: require("../assets/icons/btc.png"),
+    profit: -0.15,
+    balance: 0.002,
+  },
+  {
+    id: 4,
+    name: "Avalanche",
+    token: "AVAX",
+    price: 34.09,
+    img: require("../assets/icons/avax.png"),
+    profit: 0.5,
+    balance: 220.27,
+  },
+  {
+    id: 5,
+    name: "Binance",
+    token: "BNB",
+    price: 549.15,
+    img: require("../assets/icons/bnb.png"),
+    profit: -0.19,
+    balance: 19.2371,
+  },
+];
+
 export const listAccounts = [
   {
     id: 1,

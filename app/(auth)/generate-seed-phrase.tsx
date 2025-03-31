@@ -14,6 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { generateSeedPhrase } from "@/utils/helper";
 import HeaderProgressBar from "@/components/ui/HeaderProgressBar";
 import { BlurView } from "expo-blur";
+import { router } from "expo-router";
 
 const SecureWalletGenSeedPhraseScreen = () => {
   const navigation = useNavigation();
@@ -29,7 +30,9 @@ const SecureWalletGenSeedPhraseScreen = () => {
     return () => appStateListener.remove();
   }, []);
 
-  const handleNextPress = () => {};
+  const handleNextPress = () => {
+    router.navigate("/validate-seed-phrase");
+  };
   const toggleBlur = () => setIsBlurred((prev) => !prev);
 
   const _renderSeedPhrases = useCallback(
