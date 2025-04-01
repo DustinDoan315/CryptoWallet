@@ -1,40 +1,63 @@
-import { Button, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
-
-import { WebView } from "react-native-webview";
-import HeaderChain from "@/components/HeaderChain";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  SafeAreaView,
+  Platform,
+  StatusBar,
+} from "react-native";
+import React, { useCallback } from "react";
 import { Colors } from "@/constants/Colors";
+import HeaderChain from "@/components/HeaderChain";
 import Balance from "@/components/Balance";
 import CollectionToken from "@/components/CollectionToken";
+import CryptoWalletScreen from "@/components/CryptoWallet";
 
 const HomeScreen = () => {
-  const webViewRef = useRef<WebView>(null);
-  const [isReady, setIsReady] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [timeframe, setTimeframe] = useState<"1m" | "3m" | "5m">("1m");
-  const [wsConnected, setWsConnected] = useState(false);
+  // Memoize the render content to prevent unnecessary re-renders
+  const renderContent = useCallback(() => {
+    return (
+      <>
+        {/* <HeaderChain />
+        <Balance />
+        <CollectionToken /> */}
+        <CryptoWalletScreen />
+      </>
+    );
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <HeaderChain />
-      <Balance />
-      <CollectionToken />
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={Colors.dark_light_1}
+      />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+        overScrollMode="always">
+        {renderContent()}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
-export default HomeScreen;
+export default React.memo(HomeScreen);
 
 const styles = StyleSheet.create({
-  webview: { flex: 1 },
-  container: { flex: 1, backgroundColor: Colors.dark_light_1 },
-  status: { textAlign: "center", color: "blue" },
-  error: { textAlign: "center", color: "red" },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 10,
-    backgroundColor: "#f0f0f0",
+  safeArea: {
+    flex: 1,
+    backgroundColor: Colors.dark_light_1,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: Colors.dark_light_1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20, // Add some padding at the bottom for better scrolling experience
   },
 });
