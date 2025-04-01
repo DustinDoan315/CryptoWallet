@@ -62,44 +62,45 @@ const EnhancedCryptoChart = ({ navigation }: { navigation: any }) => {
   // More realistic/interactive order book updates
   useEffect(() => {
     const updateInterval = setInterval(() => {
-      // Update ask orders with slight variations
-      const newAskOrders = [...askOrders];
-      const randomIndex = Math.floor(Math.random() * askOrders.length);
-      const randomPrice =
-        parseFloat(askOrders[randomIndex].price.replace(",", ".")) +
-        (Math.random() * 2 - 1) * 0.2;
-      const randomAmount =
-        parseFloat(askOrders[randomIndex].amount.replace(",", ".")) +
-        (Math.random() * 2 - 1) * 0.5;
+      // Helper function to simulate price changes with preserved formatting
+      const simulatePriceChange = (
+        currentPrice: string,
+        range: number = 0.2
+      ) => {
+        // Extract the numeric parts and formatting
+        const numericPrice = parseFloat(currentPrice.replace(",", "."));
+        const variation = (Math.random() * 2 - 1) * range;
+        const newPrice = numericPrice + variation;
 
-      newAskOrders[randomIndex] = {
-        price: randomPrice.toFixed(1).replace(".", ","),
-        amount: randomAmount.toFixed(5).replace(".", ","),
+        // Determine the number of decimal places in the original price
+        const decimalPlaces = 2;
+        const randomDecimal = Math.floor(Math.random() * 100) / 100;
+
+        // Format to maintain original decimal precision
+        const formattedPrice =
+          newPrice.toFixed(decimalPlaces).replace(".", ",") + randomDecimal;
+        //0.22 make it random
+
+        return formattedPrice;
       };
 
+      // Update Ask Orders
+      const newAskOrders = askOrders.map((order) => ({
+        price: simulatePriceChange(order.price),
+        amount: order.amount,
+      }));
       setAskOrders(newAskOrders);
 
-      // Update bid orders with slight variations
-      const newBidOrders = [...bidOrders];
-      const randomBidIndex = Math.floor(Math.random() * bidOrders.length);
-      const randomBidPrice =
-        parseFloat(bidOrders[randomBidIndex].price.replace(",", ".")) +
-        (Math.random() * 2 - 1) * 0.2;
-      const randomBidAmount =
-        parseFloat(bidOrders[randomBidIndex].amount.replace(",", ".")) +
-        (Math.random() * 2 - 1) * 0.5;
-
-      newBidOrders[randomBidIndex] = {
-        price: randomBidPrice.toFixed(1).replace(".", ","),
-        amount: randomBidAmount.toFixed(5).replace(".", ","),
-      };
-
+      // Update Bid Orders
+      const newBidOrders = bidOrders.map((order) => ({
+        price: simulatePriceChange(order.price, 0.1),
+        amount: order.amount,
+      }));
       setBidOrders(newBidOrders);
     }, 3000);
 
     return () => clearInterval(updateInterval);
   }, [askOrders, bidOrders]);
-
   // Fetch historical data from Binance REST API
   const fetchHistoricalData = async (tf: TimeframeOption) => {
     try {
@@ -510,36 +511,38 @@ const EnhancedCryptoChart = ({ navigation }: { navigation: any }) => {
 
         {/* Order Entry Section */}
         <View style={styles.orderContainer}>
-          {/* Buy/Sell Tabs */}
+          {/* Buy/Sell Tabs - Modified to be horizontal */}
           <View style={styles.tabsContainer}>
-            <TouchableOpacity
-              style={[
-                styles.tabButton,
-                selectedTab === "buy" ? styles.buyTabActive : null,
-              ]}
-              onPress={() => setSelectedTab("buy")}>
-              <Text
+            <View style={styles.tabButtonsContainer}>
+              <TouchableOpacity
                 style={[
-                  styles.tabText,
-                  selectedTab === "buy" ? styles.buyTabTextActive : null,
-                ]}>
-                Mua
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.tabButton,
-                selectedTab === "sell" ? styles.sellTabActive : null,
-              ]}
-              onPress={() => setSelectedTab("sell")}>
-              <Text
+                  styles.tabButton,
+                  selectedTab === "buy" ? styles.buyTabActive : null,
+                ]}
+                onPress={() => setSelectedTab("buy")}>
+                <Text
+                  style={[
+                    styles.tabText,
+                    selectedTab === "buy" ? styles.buyTabTextActive : null,
+                  ]}>
+                  Mua
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 style={[
-                  styles.tabText,
-                  selectedTab === "sell" ? styles.sellTabTextActive : null,
-                ]}>
-                Bán
-              </Text>
-            </TouchableOpacity>
+                  styles.tabButton,
+                  selectedTab === "sell" ? styles.sellTabActive : null,
+                ]}
+                onPress={() => setSelectedTab("sell")}>
+                <Text
+                  style={[
+                    styles.tabText,
+                    selectedTab === "sell" ? styles.sellTabTextActive : null,
+                  ]}>
+                  Bán
+                </Text>
+              </TouchableOpacity>
+            </View>
             <View style={styles.kyQuyContainer}>
               <Text style={styles.kyQuyText}>Ký quỹ</Text>
               <TouchableOpacity style={styles.toggleSwitch}>
@@ -913,58 +916,74 @@ const styles = StyleSheet.create({
   },
   tabsContainer: {
     flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#111",
-    paddingBottom: 12,
-  },
-  tabButton: {
-    flex: 1,
+    justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 10,
+    paddingHorizontal: 5,
+  },
+
+  tabButtonsContainer: {
+    flexDirection: "row",
+    flex: 1,
+  },
+
+  tabButton: {
     paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 4,
     marginRight: 8,
   },
+
   buyTabActive: {
-    backgroundColor: "rgba(16, 186, 104, 0.1)",
-    borderRadius: 4,
+    backgroundColor: "rgba(0, 200, 83, 0.1)",
   },
+
   sellTabActive: {
-    backgroundColor: "rgba(249, 51, 93, 0.1)",
-    borderRadius: 4,
+    backgroundColor: "rgba(255, 72, 72, 0.1)",
   },
+
   tabText: {
-    color: "#777",
-    fontSize: 16,
-    fontWeight: "600",
+    color: "#888",
+    fontSize: 14,
+    fontWeight: "500",
   },
+
   buyTabTextActive: {
-    color: "#10BA68",
+    color: "#00c853",
+    fontWeight: "bold",
   },
+
   sellTabTextActive: {
-    color: "#F9335D",
+    color: "#ff4848",
+    fontWeight: "bold",
   },
+
   kyQuyContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginLeft: 8,
   },
+
   kyQuyText: {
-    color: "white",
     fontSize: 14,
+    color: "#888",
     marginRight: 8,
   },
+
   toggleSwitch: {
     width: 40,
-    height: 20,
-    borderRadius: 10,
+    height: 22,
     backgroundColor: "#333",
+    borderRadius: 11,
     padding: 2,
   },
+
   toggleSwitchHandle: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: "white",
+    width: 18,
+    height: 18,
+    backgroundColor: "#666",
+    borderRadius: 9,
   },
+
   orderTypeSelector: {
     flexDirection: "row",
     alignItems: "center",
