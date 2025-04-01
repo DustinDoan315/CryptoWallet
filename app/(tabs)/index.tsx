@@ -1,20 +1,9 @@
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  SafeAreaView,
-  Platform,
-  StatusBar,
-} from "react-native";
+import { StyleSheet, SafeAreaView, Platform, StatusBar } from "react-native";
 import React, { useCallback } from "react";
 import { Colors } from "@/constants/Colors";
-import HeaderChain from "@/components/HeaderChain";
-import Balance from "@/components/Balance";
-import CollectionToken from "@/components/CollectionToken";
 import CryptoWalletScreen from "@/components/CryptoWallet";
 
 const HomeScreen = () => {
-  // Memoize the render content to prevent unnecessary re-renders
   const renderContent = useCallback(() => {
     return (
       <>
@@ -32,14 +21,8 @@ const HomeScreen = () => {
         barStyle="light-content"
         backgroundColor={Colors.dark_light_1}
       />
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        bounces={true}
-        overScrollMode="always">
-        {renderContent()}
-      </ScrollView>
+
+      {renderContent()}
     </SafeAreaView>
   );
 };
@@ -58,6 +41,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 20, // Add some padding at the bottom for better scrolling experience
+    paddingBottom: 20,
   },
 });

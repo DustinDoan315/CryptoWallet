@@ -21,11 +21,19 @@ export default function SubLayout() {
         headerShadowVisible: false,
       }}>
       <Stack.Screen
-        name="subs"
+        name="crypto-search"
         options={{
           headerShown: false,
           presentation: "card",
-          title: "Add Token",
+          title: "crypto-search",
+        }}
+      />
+      <Stack.Screen
+        name="enhanced-crypto-chart"
+        options={{
+          headerShown: false,
+          presentation: "card",
+          title: "enhanced-crypto-chart",
         }}
       />
     </Stack>

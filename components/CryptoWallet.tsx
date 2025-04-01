@@ -9,15 +9,10 @@ import {
   ScrollView,
   RefreshControl,
   Alert,
-  Platform,
   TouchableHighlight,
 } from "react-native";
-import {
-  Ionicons,
-  Feather,
-  FontAwesome5,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import { Ionicons, Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 export default function CryptoWalletScreen() {
   const [refreshing, setRefreshing] = useState(false);
@@ -130,6 +125,14 @@ export default function CryptoWalletScreen() {
     return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
+  const searchToken = () => {
+    router.navigate("/(subs)/crypto-search");
+  };
+
+  const exchangeToken = () => {
+    router.navigate("/(subs)/enhanced-crypto-chart");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -213,9 +216,7 @@ export default function CryptoWalletScreen() {
             style={styles.iconButton}>
             <Feather name="sliders" size={20} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => Alert.alert("Tìm kiếm", "Tìm kiếm tài sản")}
-            style={styles.iconButton}>
+          <TouchableOpacity onPress={searchToken} style={styles.iconButton}>
             <Feather name="search" size={20} color="white" />
           </TouchableOpacity>
         </View>
@@ -225,12 +226,7 @@ export default function CryptoWalletScreen() {
           {assets.map((asset) => (
             <TouchableHighlight
               key={asset.id}
-              onPress={() =>
-                Alert.alert(
-                  `Chi tiết ${asset.name}`,
-                  `Xem chi tiết tài sản ${asset.name}`
-                )
-              }
+              onPress={() => exchangeToken()}
               underlayColor="#1C1C1E"
               style={styles.assetItemTouchable}>
               <View style={styles.assetItem}>
