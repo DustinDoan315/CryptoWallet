@@ -36,6 +36,14 @@ export default function SubLayout() {
           title: "enhanced-crypto-chart",
         }}
       />
+      <Stack.Screen
+        name="crypto-detail"
+        options={{
+          headerShown: false,
+          presentation: "card",
+          title: "crypto-detail",
+        }}
+      />
     </Stack>
   );
 }

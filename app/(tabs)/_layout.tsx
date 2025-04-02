@@ -29,8 +29,8 @@ const ICON_MAP: IconMapping = {
     active: "wallet",
   },
   exchange: {
-    inactive: "swap-horizontal",
-    active: "swap-horizontal",
+    inactive: "repeat",
+    active: "repeat",
   },
 };
 
