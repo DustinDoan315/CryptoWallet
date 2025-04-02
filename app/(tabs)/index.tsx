@@ -7,9 +7,6 @@ const HomeScreen = () => {
   const renderContent = useCallback(() => {
     return (
       <>
-        {/* <HeaderChain />
-        <Balance />
-        <CollectionToken /> */}
         <CryptoWalletScreen />
       </>
     );

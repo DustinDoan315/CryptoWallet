@@ -132,7 +132,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "OKX",
+          title: "DWallet",
         }}
       />
       <Tabs.Screen
