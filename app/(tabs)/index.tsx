@@ -1,14 +1,12 @@
 import { StyleSheet, SafeAreaView, Platform, StatusBar } from "react-native";
 import React, { useCallback } from "react";
 import { Colors } from "@/constants/Colors";
-import CryptoWalletScreen from "@/components/CryptoWallet";
 import CryptoMarketScreen from "@/components/CryptoMarket";
 
 const HomeScreen = () => {
   const renderContent = useCallback(() => {
     return (
       <>
-        {/* <CryptoWalletScreen /> */}
         <CryptoMarketScreen />
       </>
     );
