@@ -152,7 +152,7 @@ const CryptoMarketScreen: React.FC = () => {
   // Refs for managing resources
   const webSocketRef = useRef<WebSocket | null>(null);
   const retryCountRef = useRef<number>(0);
-  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const refreshIntervalRef: any = useRef<NodeJS.Timeout | null>(null);
   const appStateRef = useRef(AppState.currentState);
 
   // Symbol mapping for WebSocket (maps CoinGecko IDs to Binance symbols)
