@@ -1,0 +1,14 @@
+# Ignore log files
+*.log
+
+# Ignore the entire 'node_modules' directory
+node_modules/
+
+# Ignore all files in the 'temp' directory and its subdirectories
+temp/**
+
+# But DO NOT ignore 'important.log' even if it's in the root
+!important.log
+
+# Ignore any file named 'secret.txt' in any subdirectory
+**/secret.txt

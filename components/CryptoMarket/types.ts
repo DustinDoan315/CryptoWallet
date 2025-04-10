@@ -5,28 +5,34 @@ export interface CryptoCurrency {
   current_price: number;
   price_change_percentage_24h: number;
   image: string;
+  market_cap?: number;
+  total_volume?: number;
+  high_24h?: number;
+  low_24h?: number;
+  price_change_24h?: number;
+  last_updated?: number; // Changed from string to number (timestamp)
 }
 
-export type State = {
-  marketData: CryptoCurrency[];
-  isLoading: boolean;
-  isRefreshing: boolean;
-  error: string | null;
-  searchQuery: string;
-  lastUpdated: number | null;
-  connectionStatus: "connected" | "disconnected" | "connecting";
-};
+export interface CryptoMarketData {
+  data: CryptoCurrency[];
+  lastUpdated: number;
+  error?: string;
+}
 
-export type Action =
-  | { type: "FETCH_START"; payload?: { isRefreshing?: boolean } }
-  | { type: "FETCH_SUCCESS"; payload: { data: CryptoCurrency[] } }
-  | { type: "FETCH_ERROR"; payload: { error: string } }
-  | { type: "SET_SEARCH_QUERY"; payload: { query: string } }
-  | {
-      type: "UPDATE_PRICE";
-      payload: { id: string; price: number; priceChangePercentage24h: number };
-    }
-  | {
-      type: "SET_CONNECTION_STATUS";
-      payload: { status: "connected" | "disconnected" | "connecting" };
-    };
+export type ConnectionStatus = "connected" | "disconnected" | "connecting";
+
+export interface SymbolMapping {
+  [key: string]: string; // Maps crypto IDs to trading symbols
+}
+
+export interface CryptoListItemProps {
+  item: CryptoCurrency;
+  onPress?: (id: string) => void;
+}
+
+export interface BalanceSectionProps {
+  balance?: number;
+  currency?: string;
+  onCurrencyChange?: (currency: string) => void;
+  onToggleVisibility?: (isHidden: boolean) => void;
+}
