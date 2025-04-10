@@ -1,4 +1,4 @@
-import { FakeListAssets } from "@/utils/fake";
+import { mockTransactions } from "@/utils/fake";
 import React, { useState, useCallback } from "react";
 import {
   FlatList,
@@ -79,7 +79,7 @@ const CollectionToken: React.FC<Props> = ({ showBottomSheet }) => {
       <View style={styles.contentContainer}>
         {activePage === "token" ? (
           <FlatList
-            data={FakeListAssets}
+            data={mockTransactions}
             renderItem={renderItem}
             keyExtractor={(item, index) => index.toString()}
             ListFooterComponent={() => (

@@ -237,6 +237,14 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 20,
   },
+  errorHelpText: {
+    color: "#3498db",
+    fontSize: 12,
+    marginTop: 8,
+    textAlign: "center",
+    lineHeight: 18,
+    textDecorationLine: "underline",
+  },
 
   connectionIndicator: {
     paddingHorizontal: 8,

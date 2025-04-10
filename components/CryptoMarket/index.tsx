@@ -15,11 +15,11 @@ import { styles } from "./styles";
 import CryptoListItem from "./components/CryptoListItem";
 import BalanceSection from "./components/BalanceSection";
 import { useCryptoMarket } from "@/hooks/useCryptoMarket";
-import type { CryptoCurrency } from "./types";
+import type { CryptoCurrency, ConnectionStatus } from "./types";
 
 const symbolMap = {
   bitcoin: "btcusdt",
-  ethereum: "ethusdt", 
+  ethereum: "ethusdt",
   binancecoin: "bnbusdt",
   ripple: "xrpusdt",
   cardano: "adausdt",
@@ -27,6 +27,64 @@ const symbolMap = {
   polkadot: "dotusdt",
   dogecoin: "dogeusdt",
 };
+
+const renderItem = ({ item }: { item: CryptoCurrency }) => (
+  <CryptoListItem item={item} />
+);
+
+const keyExtractor = (item: CryptoCurrency) => item.id;
+
+const ListHeaderComponent = () => (
+  <View>
+    <View style={styles.columnHeaders}>
+      <Text style={styles.columnHeaderText}>Tên</Text>
+      <Text style={[styles.columnHeaderText, styles.rightAligned]}>
+        Thay đổi
+      </Text>
+    </View>
+  </View>
+);
+
+interface ListEmptyComponentProps {
+  isLoading: boolean;
+}
+
+const ListEmptyComponent = ({ isLoading }: ListEmptyComponentProps) => (
+  <View style={styles.emptyContainer}>
+    <Text style={styles.emptyText}>
+      {isLoading ? "Loading cryptocurrencies..." : "No cryptocurrencies found"}
+    </Text>
+  </View>
+);
+
+interface ConnectionStatusIndicatorProps {
+  connectionStatus: ConnectionStatus;
+}
+
+const ConnectionStatusIndicator = ({
+  connectionStatus,
+}: ConnectionStatusIndicatorProps) => (
+  <View
+    style={[
+      styles.connectionIndicator,
+      {
+        backgroundColor:
+          connectionStatus === "connected"
+            ? "#27ae60"
+            : connectionStatus === "connecting"
+            ? "#f39c12"
+            : "#e74c3c",
+      },
+    ]}>
+    <Text style={styles.connectionText}>
+      {connectionStatus === "connected"
+        ? "Live"
+        : connectionStatus === "connecting"
+        ? "Connecting..."
+        : "Offline"}
+    </Text>
+  </View>
+);
 
 const CryptoMarketScreen: React.FC = () => {
   const {
@@ -40,56 +98,7 @@ const CryptoMarketScreen: React.FC = () => {
     refresh,
   } = useCryptoMarket({ symbolMap });
 
-  const filteredMarketData = marketData.slice(0, 7); // Show top 7 cryptos
-
-  const renderItem = ({ item }: { item: CryptoCurrency }) => (
-    <CryptoListItem item={item} />
-  );
-
-  const keyExtractor = (item: CryptoCurrency) => item.id;
-
-  const ListHeaderComponent = (
-    <View>
-      <View style={styles.columnHeaders}>
-        <Text style={styles.columnHeaderText}>Tên</Text>
-        <Text style={[styles.columnHeaderText, styles.rightAligned]}>
-          Thay đổi
-        </Text>
-      </View>
-    </View>
-  );
-
-  const ListEmptyComponent = (
-    <View style={styles.emptyContainer}>
-      <Text style={styles.emptyText}>
-        {isLoading ? "Loading cryptocurrencies..." : "No cryptocurrencies found"}
-      </Text>
-    </View>
-  );
-
-  const ConnectionStatusIndicator = (
-    <View
-      style={[
-        styles.connectionIndicator,
-        {
-          backgroundColor:
-            connectionStatus === "connected"
-              ? "#27ae60"
-              : connectionStatus === "connecting"
-              ? "#f39c12"
-              : "#e74c3c",
-        },
-      ]}
-    >
-      <Text style={styles.connectionText}>
-        {connectionStatus === "connected"
-          ? "Live"
-          : connectionStatus === "connecting"
-          ? "Connecting..."
-          : "Offline"}
-      </Text>
-    </View>
-  );
+  const filteredMarketData = marketData.slice(0, 7);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -101,7 +110,7 @@ const CryptoMarketScreen: React.FC = () => {
           <Ionicons name="grid" size={24} color="white" />
           <Text style={styles.headerTitle}>Giao dịch mô phỏng</Text>
         </View>
-        {ConnectionStatusIndicator}
+        <ConnectionStatusIndicator connectionStatus={connectionStatus} />
       </View>
 
       {/* Balance Section */}
@@ -128,15 +137,18 @@ const CryptoMarketScreen: React.FC = () => {
       </View>
 
       {/* Loading Indicator */}
-      {isLoading && marketData.length === 0 ? (
+      {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3498db" />
           <Text style={styles.loadingText}>Loading market data...</Text>
         </View>
-      ) : error && marketData.length === 0 ? (
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={24} color="#e74c3c" />
-          <Text style={styles.errorText}>{error}</Text>
+      ) : marketData.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="alert-circle-outline" size={24} color="#f39c12" />
+          <Text style={styles.emptyText}>No market data available</Text>
+          <Text style={styles.errorHelpText}>
+            Please check your internet connection
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -145,7 +157,7 @@ const CryptoMarketScreen: React.FC = () => {
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={ListHeaderComponent}
-          ListEmptyComponent={ListEmptyComponent}
+          ListEmptyComponent={<ListEmptyComponent isLoading={isLoading} />}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}

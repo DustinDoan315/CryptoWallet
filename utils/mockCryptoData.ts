@@ -8,7 +8,7 @@ export const mockCryptoMarketData: CryptoCurrency[] = [
     name: "Bitcoin",
     current_price: 83345.42,
     price_change_percentage_24h: 2.34,
-    image: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+    image: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png",
   },
   {
     id: "ethereum",
@@ -16,7 +16,7 @@ export const mockCryptoMarketData: CryptoCurrency[] = [
     name: "Ethereum",
     current_price: 3245.18,
     price_change_percentage_24h: 1.56,
-    image: "https://assets.coingecko.com/coins/images/279/large/ethereum.png"
+    image: "https://assets.coingecko.com/coins/images/279/large/ethereum.png",
   },
   {
     id: "binancecoin",
@@ -24,7 +24,8 @@ export const mockCryptoMarketData: CryptoCurrency[] = [
     name: "BNB",
     current_price: 612.73,
     price_change_percentage_24h: -0.82,
-    image: "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png"
+    image:
+      "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png",
   },
   {
     id: "ripple",
@@ -32,7 +33,8 @@ export const mockCryptoMarketData: CryptoCurrency[] = [
     name: "XRP",
     current_price: 0.5423,
     price_change_percentage_24h: 0.21,
-    image: "https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png"
+    image:
+      "https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png",
   },
   {
     id: "cardano",
@@ -40,7 +42,7 @@ export const mockCryptoMarketData: CryptoCurrency[] = [
     name: "Cardano",
     current_price: 0.4532,
     price_change_percentage_24h: -1.23,
-    image: "https://assets.coingecko.com/coins/images/975/large/cardano.png"
+    image: "https://assets.coingecko.com/coins/images/975/large/cardano.png",
   },
   {
     id: "solana",
@@ -48,7 +50,7 @@ export const mockCryptoMarketData: CryptoCurrency[] = [
     name: "Solana",
     current_price: 142.87,
     price_change_percentage_24h: 3.45,
-    image: "https://assets.coingecko.com/coins/images/4128/large/solana.png"
+    image: "https://assets.coingecko.com/coins/images/4128/large/solana.png",
   },
   {
     id: "polkadot",
@@ -56,7 +58,7 @@ export const mockCryptoMarketData: CryptoCurrency[] = [
     name: "Polkadot",
     current_price: 7.23,
     price_change_percentage_24h: 0.67,
-    image: "https://assets.coingecko.com/coins/images/12171/large/polkadot.png"
+    image: "https://assets.coingecko.com/coins/images/12171/large/polkadot.png",
   },
   {
     id: "dogecoin",
@@ -64,7 +66,7 @@ export const mockCryptoMarketData: CryptoCurrency[] = [
     name: "Dogecoin",
     current_price: 0.1234,
     price_change_percentage_24h: 5.67,
-    image: "https://assets.coingecko.com/coins/images/5/large/dogecoin.png"
+    image: "https://assets.coingecko.com/coins/images/5/large/dogecoin.png",
   },
   {
     id: "avalanche-2",
@@ -72,7 +74,8 @@ export const mockCryptoMarketData: CryptoCurrency[] = [
     name: "Avalanche",
     current_price: 35.67,
     price_change_percentage_24h: 2.12,
-    image: "https://assets.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png"
+    image:
+      "https://assets.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png",
   },
   {
     id: "chainlink",
@@ -80,6 +83,7 @@ export const mockCryptoMarketData: CryptoCurrency[] = [
     name: "Chainlink",
     current_price: 15.23,
     price_change_percentage_24h: 1.89,
-    image: "https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png"
-  }
+    image:
+      "https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png",
+  },
 ];

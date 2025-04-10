@@ -9,58 +9,121 @@ interface WebSocketServiceOptions {
   onStatusChange: (status: ConnectionStatus) => void;
 }
 
-export class CryptoWebSocketService {
-  private static WEBSOCKET_URL = "wss://stream.binance.com:9443/ws";
-  private static RECONNECT_DELAY = 30 * 1000; // 30 seconds
-  private static HEALTH_CHECK_INTERVAL = 15 * 1000; // 15 seconds
-  private static PING_INTERVAL = 10 * 1000; // 10 seconds
+const WEBSOCKET_URL = "wss://stream.binance.com:9443/ws";
+const RECONNECT_DELAY = 30 * 1000; // 30 seconds
+const HEALTH_CHECK_INTERVAL = 15 * 1000; // 15 seconds
+const PING_INTERVAL = 10 * 1000; // 10 seconds
+const MAX_RETRIES = 3;
 
-  private webSocket: WebSocket | null = null;
-  private retryCount = 0;
-  private maxRetries = 3;
-  private subscribedSymbols: string[] = [];
-  private options: WebSocketServiceOptions;
-  private healthCheckTimer?: NodeJS.Timeout;
-  private pingTimer?: NodeJS.Timeout;
-  private lastMessageTime = 0;
+export const createCryptoWebSocketService = (
+  options: WebSocketServiceOptions
+) => {
+  let webSocket: WebSocket | null = null;
+  let retryCount = 0;
+  let subscribedSymbols: string[] = [];
+  let healthCheckTimer: number | null = null;
+  let pingTimer: number | null = null;
+  let lastMessageTime = 0;
 
-  constructor(options: WebSocketServiceOptions) {
-    this.options = options;
-  }
+  const cleanup = () => {
+    if (webSocket) {
+      webSocket.close();
+      webSocket = null;
+    }
+    stopHealthChecks();
+  };
 
-  connect(symbols: string[]) {
-    if (this.webSocket) {
-      this.disconnect();
+  const stopHealthChecks = () => {
+    if (pingTimer) {
+      clearInterval(pingTimer);
+      pingTimer = null;
+    }
+    if (healthCheckTimer) {
+      clearInterval(healthCheckTimer);
+      healthCheckTimer = null;
+    }
+  };
+
+  const startHealthChecks = () => {
+    stopHealthChecks();
+
+    pingTimer = setInterval(() => {
+      if (webSocket?.readyState === WebSocket.OPEN) {
+        webSocket.send(JSON.stringify({ ping: Date.now() }));
+      }
+    }, PING_INTERVAL);
+
+    healthCheckTimer = setInterval(() => {
+      const timeSinceLastMessage = Date.now() - lastMessageTime;
+      if (timeSinceLastMessage > HEALTH_CHECK_INTERVAL) {
+        console.warn("No messages received recently, reconnecting...");
+        disconnect();
+        handleReconnect();
+      }
+    }, HEALTH_CHECK_INTERVAL);
+  };
+
+  const subscribeToSymbols = () => {
+    if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+      const subscribeMsg = {
+        method: "SUBSCRIBE",
+        params: subscribedSymbols.map((symbol) => `${symbol}@ticker`),
+        id: 1,
+      };
+      webSocket.send(JSON.stringify(subscribeMsg));
+    }
+  };
+
+  const getCryptoIdFromSymbol = (symbol: string): string => {
+    return symbol.toLowerCase().replace("usdt", "");
+  };
+
+  const handleReconnect = () => {
+    if (retryCount < MAX_RETRIES) {
+      retryCount++;
+      const backoffTime = Math.min(
+        Math.pow(2, retryCount) * 1000,
+        30 * 1000 // Max 30 seconds
+      );
+      setTimeout(() => connect(subscribedSymbols), backoffTime);
+    } else {
+      setTimeout(() => {
+        retryCount = 0;
+        connect(subscribedSymbols);
+      }, RECONNECT_DELAY);
+    }
+  };
+
+  const connect = (symbols: string[]) => {
+    if (webSocket) {
+      disconnect();
     }
 
-    this.subscribedSymbols = symbols;
-    this.retryCount = 0;
-    this.options.onStatusChange("connecting");
+    subscribedSymbols = symbols;
+    retryCount = 0;
+    options.onStatusChange("connecting");
 
     try {
-      this.webSocket = new WebSocket(CryptoWebSocketService.WEBSOCKET_URL);
+      webSocket = new WebSocket(WEBSOCKET_URL);
 
-      this.webSocket.onopen = () => {
-        this.retryCount = 0;
-        this.lastMessageTime = Date.now();
-        this.options.onStatusChange("connected");
-        this.subscribeToSymbols();
-        this.startHealthChecks();
+      webSocket.onopen = () => {
+        retryCount = 0;
+        lastMessageTime = Date.now();
+        options.onStatusChange("connected");
+        subscribeToSymbols();
+        startHealthChecks();
       };
 
-      this.webSocket.onmessage = (event) => {
+      webSocket.onmessage = (event) => {
         try {
-          this.lastMessageTime = Date.now();
+          lastMessageTime = Date.now();
           const data = JSON.parse(event.data);
-          
-          // Handle ping responses
-          if (data.pong) {
-            return;
-          }
-          
+
+          if (data.pong) return;
+
           if (data.e === "ticker") {
-            this.options.onMessage({
-              id: this.getCryptoIdFromSymbol(data.s),
+            options.onMessage({
+              id: getCryptoIdFromSymbol(data.s),
               price: parseFloat(data.c),
               priceChangePercentage24h: parseFloat(data.P),
             });
@@ -70,102 +133,31 @@ export class CryptoWebSocketService {
         }
       };
 
-      this.webSocket.onerror = (error) => {
+      webSocket.onerror = (error) => {
         console.error("WebSocket error:", error);
-        this.cleanup();
-        this.options.onStatusChange("disconnected");
+        cleanup();
+        options.onStatusChange("disconnected");
       };
 
-      this.webSocket.onclose = () => {
-        this.cleanup();
-        this.options.onStatusChange("disconnected");
-        this.handleReconnect();
+      webSocket.onclose = () => {
+        cleanup();
+        options.onStatusChange("disconnected");
+        handleReconnect();
       };
     } catch (error) {
       console.error("Error setting up WebSocket:", error);
-      this.cleanup();
-      this.options.onStatusChange("disconnected");
-      this.handleReconnect();
+      cleanup();
+      options.onStatusChange("disconnected");
+      handleReconnect();
     }
-  }
+  };
 
-  disconnect() {
-    this.cleanup();
-  }
+  const disconnect = () => {
+    cleanup();
+  };
 
-  private cleanup() {
-    if (this.webSocket) {
-      this.webSocket.close();
-      this.webSocket = null;
-    }
-    this.stopHealthChecks();
-  }
-
-  private startHealthChecks() {
-    this.stopHealthChecks();
-    
-    // Send periodic pings
-    this.pingTimer = setInterval(() => {
-      if (this.webSocket?.readyState === WebSocket.OPEN) {
-        this.webSocket.send(JSON.stringify({ ping: Date.now() }));
-      }
-    }, CryptoWebSocketService.PING_INTERVAL);
-
-    // Check connection health
-    this.healthCheckTimer = setInterval(() => {
-      const timeSinceLastMessage = Date.now() - this.lastMessageTime;
-      if (timeSinceLastMessage > CryptoWebSocketService.HEALTH_CHECK_INTERVAL) {
-        console.warn('No messages received recently, reconnecting...');
-        this.disconnect();
-        this.handleReconnect();
-      }
-    }, CryptoWebSocketService.HEALTH_CHECK_INTERVAL);
-  }
-
-  private stopHealthChecks() {
-    if (this.pingTimer) {
-      clearInterval(this.pingTimer);
-      this.pingTimer = undefined;
-    }
-    if (this.healthCheckTimer) {
-      clearInterval(this.healthCheckTimer);
-      this.healthCheckTimer = undefined;
-    }
-  }
-
-  private subscribeToSymbols() {
-    if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
-      const subscribeMsg = {
-        method: "SUBSCRIBE",
-        params: this.subscribedSymbols.map((symbol) => `${symbol}@ticker`),
-        id: 1,
-      };
-      this.webSocket.send(JSON.stringify(subscribeMsg));
-    }
-  }
-
-  private handleReconnect() {
-    if (this.retryCount < this.maxRetries) {
-      this.retryCount++;
-      const backoffTime = Math.min(
-        Math.pow(2, this.retryCount) * 1000,
-        30 * 1000 // Max 30 seconds
-      );
-      setTimeout(() => this.connect(this.subscribedSymbols), backoffTime);
-    } else {
-      setTimeout(
-        () => {
-          this.retryCount = 0; // Reset retry count after max retries
-          this.connect(this.subscribedSymbols);
-        },
-        CryptoWebSocketService.RECONNECT_DELAY
-      );
-    }
-  }
-
-  private getCryptoIdFromSymbol(symbol: string): string {
-    // This mapping should be provided by the parent component
-    // Default to returning the symbol in lowercase
-    return symbol.toLowerCase().replace("usdt", "");
-  }
-}
+  return {
+    connect,
+    disconnect,
+  };
+};

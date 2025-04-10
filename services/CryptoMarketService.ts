@@ -15,8 +15,9 @@ const DEFAULT_PARAMS = {
   per_page: "20",
   page: "1",
   sparkline: "false",
-  price_change_percentage: "24h"
+  price_change_percentage: "24h",
 };
+const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY; // Optional API key
 
 // Rate limit tracking
 interface RateLimitInfo {
@@ -41,7 +42,9 @@ interface CacheData {
 }
 
 export class CryptoMarketService {
-  static async fetchMarketData(forceRefresh = false): Promise<CryptoCurrency[]> {
+  static async fetchMarketData(
+    forceRefresh = false
+  ): Promise<CryptoCurrency[]> {
     // Always check cache first unless forced refresh
     if (!forceRefresh) {
       const cachedData = await this.loadFromCache();
@@ -71,7 +74,7 @@ export class CryptoMarketService {
       return await this.fetchWithRetry();
     } catch (error) {
       console.error("Error fetching market data:", error);
-      
+
       // If we get a 429 error, mark as rate limited
       if (error instanceof Error) {
         console.error(`API Error: ${error.message}`);
@@ -80,31 +83,37 @@ export class CryptoMarketService {
           await this.markRateLimited();
         }
       }
-      
+
       // Try to use cached data even if expired
       const cachedData = await this.loadFromCache(true);
       if (cachedData) {
         return cachedData;
       }
-      
+
       // Last resort: use mock data
       return mockCryptoMarketData;
     }
   }
 
-  private static async fetchWithRetry(retryCount = 0): Promise<CryptoCurrency[]> {
+  private static async fetchWithRetry(
+    retryCount = 0
+  ): Promise<CryptoCurrency[]> {
     try {
       const url = new URL(COINGECKO_API_URL);
       Object.entries(DEFAULT_PARAMS).forEach(([key, value]) => {
         url.searchParams.append(key, value);
       });
 
-      const response = await fetch(url.toString(), {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        }
-      });
+      const headers: Record<string, string> = {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      };
+
+      if (COINGECKO_API_KEY) {
+        headers["x-cg-pro-api-key"] = COINGECKO_API_KEY;
+      }
+
+      const response = await fetch(url.toString(), { headers });
 
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`);
@@ -117,9 +126,13 @@ export class CryptoMarketService {
       if (retryCount < MAX_RETRIES) {
         // Exponential backoff
         const delay = RETRY_DELAY * Math.pow(2, retryCount);
-        console.log(`Retrying API call in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`);
-        
-        await new Promise(resolve => setTimeout(resolve, delay));
+        console.log(
+          `Retrying API call in ${delay}ms (attempt ${
+            retryCount + 1
+          }/${MAX_RETRIES})`
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
         return this.fetchWithRetry(retryCount + 1);
       }
       throw error;
@@ -131,7 +144,7 @@ export class CryptoMarketService {
       const rateLimitJson = await AsyncStorage.getItem(RATE_LIMIT_CACHE_KEY);
       if (rateLimitJson) {
         const rateLimit = JSON.parse(rateLimitJson) as RateLimitInfo;
-        
+
         // Check if we're in a rate-limited state
         if (rateLimit.isLimited) {
           // Check if rate limit period has expired
@@ -142,9 +155,12 @@ export class CryptoMarketService {
           }
           return true;
         }
-        
+
         // Check if we've made too many requests recently
-        if (Date.now() - rateLimit.timestamp < RATE_LIMIT_RESET_TIME && rateLimit.count >= 5) {
+        if (
+          Date.now() - rateLimit.timestamp < RATE_LIMIT_RESET_TIME &&
+          rateLimit.count >= 5
+        ) {
           await this.markRateLimited();
           return true;
         }
@@ -160,16 +176,16 @@ export class CryptoMarketService {
     try {
       const rateLimitJson = await AsyncStorage.getItem(RATE_LIMIT_CACHE_KEY);
       let rateLimit: RateLimitInfo;
-      
+
       if (rateLimitJson) {
         rateLimit = JSON.parse(rateLimitJson) as RateLimitInfo;
-        
+
         // Reset count if time window has passed
         if (Date.now() - rateLimit.timestamp > RATE_LIMIT_RESET_TIME) {
           rateLimit = {
             timestamp: Date.now(),
             count: 1,
-            isLimited: false
+            isLimited: false,
           };
         } else {
           // Increment count
@@ -180,11 +196,14 @@ export class CryptoMarketService {
         rateLimit = {
           timestamp: Date.now(),
           count: 1,
-          isLimited: false
+          isLimited: false,
         };
       }
-      
-      await AsyncStorage.setItem(RATE_LIMIT_CACHE_KEY, JSON.stringify(rateLimit));
+
+      await AsyncStorage.setItem(
+        RATE_LIMIT_CACHE_KEY,
+        JSON.stringify(rateLimit)
+      );
     } catch (error) {
       console.error("Error tracking API call:", error);
     }
@@ -195,9 +214,12 @@ export class CryptoMarketService {
       const rateLimit: RateLimitInfo = {
         timestamp: Date.now(),
         count: 5,
-        isLimited: true
+        isLimited: true,
       };
-      await AsyncStorage.setItem(RATE_LIMIT_CACHE_KEY, JSON.stringify(rateLimit));
+      await AsyncStorage.setItem(
+        RATE_LIMIT_CACHE_KEY,
+        JSON.stringify(rateLimit)
+      );
     } catch (error) {
       console.error("Error marking rate limited:", error);
     }
@@ -208,9 +230,12 @@ export class CryptoMarketService {
       const rateLimit: RateLimitInfo = {
         timestamp: Date.now(),
         count: 0,
-        isLimited: false
+        isLimited: false,
       };
-      await AsyncStorage.setItem(RATE_LIMIT_CACHE_KEY, JSON.stringify(rateLimit));
+      await AsyncStorage.setItem(
+        RATE_LIMIT_CACHE_KEY,
+        JSON.stringify(rateLimit)
+      );
     } catch (error) {
       console.error("Error resetting rate limit:", error);
     }
@@ -231,7 +256,9 @@ export class CryptoMarketService {
     }
   }
 
-  private static async loadFromCache(ignoreExpiry = false): Promise<CryptoCurrency[] | null> {
+  private static async loadFromCache(
+    ignoreExpiry = false
+  ): Promise<CryptoCurrency[] | null> {
     try {
       const cachedJson = await AsyncStorage.getItem(MARKET_DATA_CACHE_KEY);
       if (cachedJson) {
